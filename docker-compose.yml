@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: muni
+      POSTGRES_PASSWORD: muni
+      POSTGRES_DB: muni
+    ports:
+      # 5434 on the host: 5432 may be a local PostgreSQL and 5433 the Flask version's.
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Over TCP, so the temporary server Postgres runs during first-time setup
+      # doesn't count as healthy.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U muni -d muni"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
