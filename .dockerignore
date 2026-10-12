@@ -1,0 +1,21 @@
+# Keep the build context small, and keep secrets out of the image:
+# configuration such as .env is passed in when the container runs, never baked in.
+.env
+.env.*
+!.env.example
+
+.git/
+.github/
+.venv/
+venv/
+.claude/
+.vscode/
+.idea/
+
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+staticfiles/
+db.sqlite3
+
+tests/

@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# The workflow only needs to read the code.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    # A real PostgreSQL next to the job, same as docker-compose gives you locally.
+    # pytest-django creates its own test_muni database on it.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: muni
+          POSTGRES_PASSWORD: muni
+          POSTGRES_DB: muni
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U muni -d muni"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgres://muni:muni@localhost:5432/muni
+      DJANGO_SECRET_KEY: ci-only-not-a-real-secret
+      # No ANTHROPIC_API_KEY: the chat tests use a fake Claude client, so CI is free.
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Django system checks
+        run: python manage.py check
+
+      # Fails if a model changed but nobody ran makemigrations.
+      - name: No missing migrations
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Run tests
+        run: pytest
+
+  docker:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Build image
+        run: docker build --tag muni-assistant-django:ci .

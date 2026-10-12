@@ -1,0 +1,3 @@
+-r requirements.txt
+# Production WSGI server, used by the Docker image (it doesn't run on Windows).
+gunicorn>=23.0

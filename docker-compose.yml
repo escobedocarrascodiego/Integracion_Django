@@ -18,5 +18,24 @@ services:
       timeout: 3s
       retries: 10
 
+  web:
+    build: .
+    env_file:
+      # DJANGO_SECRET_KEY, ANTHROPIC_API_KEY... (see .env.example)
+      - path: .env
+        required: false
+    environment:
+      # Inside the compose network the database is reached as "db" on its own port.
+      DATABASE_URL: postgres://muni:muni@db:5432/muni
+      DJANGO_DEBUG: "false"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+    ports:
+      # 8002 on the host: 8000 may be the Flask version, 8001 `runserver` in development.
+      - "8002:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   pgdata:
