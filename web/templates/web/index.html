@@ -1,0 +1,63 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atención ciudadana</title>
+  <link rel="icon" href="{% static 'web/favicon.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'web/style.css' %}">
+  <script src="{% static 'web/app.js' %}" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <div>
+        <div class="brand-title">Municipalidad Distrital de Ejemplo</div>
+        <div class="brand-subtitle">Asistente de atención ciudadana</div>
+      </div>
+    </div>
+    <div class="session" id="session" hidden>
+      <span class="user-name" id="user-name"></span>
+      <button type="button" class="ghost" id="new-chat">Nueva conversación</button>
+      <button type="button" class="ghost" id="logout">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card login" id="login-view" hidden>
+      <h1>Iniciar sesión</h1>
+      <p class="muted">Consulta trámites municipales y el estado de tus reclamos.</p>
+      <form id="login-form" novalidate>
+        <label for="email">Correo electrónico</label>
+        {# Demo accounts, as a convenience for local development. #}
+        <input id="email" type="email" autocomplete="username" list="demo-users" required>
+        <datalist id="demo-users">
+          <option value="maria.quispe@example.com"></option>
+          <option value="jose.mamani@example.com"></option>
+          <option value="rosa.flores@example.com"></option>
+        </datalist>
+        <label for="password">Contraseña</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+        <p class="form-error" id="login-error" role="alert" hidden></p>
+        <button type="submit" class="primary" id="login-button">Ingresar</button>
+      </form>
+      <p class="hint">Desarrollo: las cuentas de demo y su contraseña están en <code>municipal/sample_data.py</code>.</p>
+    </section>
+
+    <section class="chat" id="chat-view" hidden>
+      <div class="messages" id="messages" aria-live="polite"></div>
+      <div class="suggestions" id="suggestions">
+        <button type="button" class="suggestion">¿Cómo van mis reclamos?</button>
+        <button type="button" class="suggestion">¿Qué necesito para una licencia de funcionamiento?</button>
+        <button type="button" class="suggestion">¿Cuánto cuesta una copia de partida de nacimiento?</button>
+      </div>
+      <form class="composer" id="chat-form">
+        <textarea id="question" rows="1" maxlength="4000" placeholder="Escribe tu consulta…"
+                  aria-label="Tu consulta" required></textarea>
+        <button type="submit" class="primary" id="send">Enviar</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
