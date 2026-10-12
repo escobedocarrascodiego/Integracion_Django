@@ -6,6 +6,7 @@ file fills them in (see .env.example).
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -40,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',  # only for its translated error messages
     'accounts',
     'municipal',
 ]
@@ -90,6 +93,27 @@ DATABASES = {
 # Set before the first migration: swapping the user model later is very hard.
 
 AUTH_USER_MODEL = 'accounts.User'
+
+
+# REST API
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # API clients send "Authorization: Bearer <token>".
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # Lets you explore the browsable API after logging in to the admin.
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    # Secure by default: every endpoint needs a logged-in user unless it says otherwise.
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
+}
+
+SIMPLE_JWT = {
+    # The access token goes with every request and expires soon; the refresh
+    # token only gets new access tokens, so the password isn't typed again.
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
