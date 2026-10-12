@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',  # only for its translated error messages
     'accounts',
     'municipal',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -113,6 +114,25 @@ SIMPLE_JWT = {
     # token only gets new access tokens, so the password isn't typed again.
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+
+# Claude. The API key isn't read here: the Anthropic SDK takes ANTHROPIC_API_KEY
+# from the environment on its own (load_dotenv() above puts .env values there).
+
+ANTHROPIC_MODEL = os.getenv('ANTHROPIC_MODEL') or 'claude-opus-5-5'
+# Only for API keys that aren't scoped to a single workspace.
+ANTHROPIC_WORKSPACE_ID = os.getenv('ANTHROPIC_WORKSPACE_ID') or None
+
+
+# Show the chat loop's log lines (tool calls, token usage) in the console.
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {'simple': {'format': '{levelname} {name}: {message}', 'style': '{'}},
+    'handlers': {'console': {'class': 'logging.StreamHandler', 'formatter': 'simple'}},
+    'loggers': {'chat': {'handlers': ['console'], 'level': 'INFO'}},
 }
 
 AUTH_PASSWORD_VALIDATORS = [

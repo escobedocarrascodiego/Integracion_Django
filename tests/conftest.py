@@ -1,4 +1,5 @@
 import pytest
+from claude_fakes import FakeClaude
 from rest_framework.test import APIClient
 
 from accounts.models import User
@@ -15,6 +16,14 @@ def sample_data(db):
 @pytest.fixture
 def api_client():
     return APIClient()
+
+
+@pytest.fixture
+def fake_claude(monkeypatch):
+    """Replace the real Claude client with a scripted fake for the whole test."""
+    fake = FakeClaude()
+    monkeypatch.setattr("chat.client.get_client", lambda: fake)
+    return fake
 
 
 @pytest.fixture
